@@ -1356,26 +1356,19 @@
         function setupPoolCarousel() {
             const poolGrid = document.getElementById('poolGrid');
             if (!window.matchMedia('(max-width: 600px)').matches) return;
-            const updateFocus = () => {
-                const gridCenter = poolGrid.getBoundingClientRect().left + poolGrid.clientWidth / 2;
-                let closest = null;
-                let closestDistance = Infinity;
-                poolGrid.querySelectorAll('[data-pool-map]').forEach(button => {
-                    const box = button.getBoundingClientRect();
-                    const distance = Math.abs(box.left + box.width / 2 - gridCenter);
-                    const scale = Math.max(.84, 1 - distance / (box.width * 5));
-                    button.style.setProperty('--focus-scale', scale.toFixed(3));
-                    button.style.opacity = Math.max(.62, scale).toFixed(2);
-                    if (distance < closestDistance) { closest = button; closestDistance = distance; }
-                });
-                updatePoolArrows();
-            };
+            const cards = [...poolGrid.querySelectorAll('[data-pool-map]')];
+            let focusedIndex = Math.max(0, cards.findIndex(card => card.dataset.poolMap === state.map));
             let settleTimer;
-            const settleMap = () => { clearTimeout(settleTimer); settleTimer = setTimeout(() => { const focused = [...poolGrid.querySelectorAll('[data-pool-map]')].find(button => button.style.getPropertyValue('--focus-scale') === '1.000'); if (focused && state.pool.has(focused.dataset.poolMap) && state.map !== focused.dataset.poolMap) { state.map = focused.dataset.poolMap; renderMapSelector(); renderMap(); } }, 140); };
-            poolGrid.addEventListener('scroll', () => { updateFocus(); settleMap(); }, { passive: true });
-            document.getElementById('poolPrev').onclick = () => poolGrid.scrollBy({ left: -poolGrid.clientWidth * .72, behavior: 'smooth' });
-            document.getElementById('poolNext').onclick = () => poolGrid.scrollBy({ left: poolGrid.clientWidth * .72, behavior: 'smooth' });
-            updateFocus();
+            let direction = 0;
+            let programmatic = false;
+            const setScale = (index, settled) => { cards.forEach((card, cardIndex) => { card.style.setProperty('--focus-scale', settled && cardIndex === index ? '1.000' : '.840'); card.style.opacity = settled && cardIndex === index ? '1' : '.72'; }); };
+            const centerCard = (index, behavior = 'smooth') => { const card = cards[index]; if (!card) return; focusedIndex = index; programmatic = behavior === 'smooth'; poolGrid.scrollTo({ left: card.offsetLeft - (poolGrid.clientWidth - card.offsetWidth) / 2, behavior }); setScale(index, behavior !== 'smooth'); updatePoolArrows(); };
+            const settle = () => { poolGrid.classList.remove('is-scrolling'); const nextIndex = programmatic ? focusedIndex : Math.max(0, Math.min(cards.length - 1, focusedIndex + direction)); focusedIndex = nextIndex; programmatic = false; setScale(nextIndex, true); const key = cards[nextIndex].dataset.poolMap; if (state.pool.has(key) && state.map !== key) { state.map = key; renderMapSelector(); renderMap(); } direction = 0; };
+            poolGrid.addEventListener('scroll', () => { poolGrid.classList.add('is-scrolling'); direction = poolGrid.scrollLeft > (poolGrid._lastScrollLeft || poolGrid.scrollLeft) ? 1 : -1; poolGrid._lastScrollLeft = poolGrid.scrollLeft; clearTimeout(settleTimer); settleTimer = setTimeout(settle, 150); updatePoolArrows(); }, { passive: true });
+            document.getElementById('poolPrev').onclick = () => centerCard(Math.max(0, focusedIndex - 1));
+            document.getElementById('poolNext').onclick = () => centerCard(Math.min(cards.length - 1, focusedIndex + 1));
+            centerCard(focusedIndex, 'auto');
+            setScale(focusedIndex, true);
         }
 
         function updatePoolArrows() { const poolGrid = document.getElementById('poolGrid'); document.getElementById('poolPrev').disabled = poolGrid.scrollLeft <= 2; document.getElementById('poolNext').disabled = poolGrid.scrollLeft + poolGrid.clientWidth >= poolGrid.scrollWidth - 2; }
