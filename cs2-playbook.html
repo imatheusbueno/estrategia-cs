@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS2 Playbook</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a0e27;
+            --bg-card: #151b35;
+            --border-color: #1e2847;
+            --accent-blue: #00d4ff;
+            --accent-red: #ff3355;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --ct-color: #4a7bff;
+            --tr-color: #ff6b35;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        header {
+            margin-bottom: 40px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 24px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-red));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .map-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .map-btn {
+            padding: 12px 16px;
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .map-btn:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+        }
+
+        .map-btn.active {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: var(--bg-dark);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .map-header {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            border-left: 4px solid var(--accent-blue);
+        }
+
+        .map-name {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .map-info {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .strategies-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 1024px) {
+            .strategies-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .side-strategies {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .side-header {
+            font-size: 18px;
+            font-weight: 700;
+            padding: 12px;
+            border-radius: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ct-header {
+            background: rgba(74, 123, 255, 0.15);
+            color: var(--ct-color);
+            border-left: 4px solid var(--ct-color);
+        }
+
+        .tr-header {
+            background: rgba(255, 107, 53, 0.15);
+            color: var(--tr-color);
+            border-left: 4px solid var(--tr-color);
+        }
+
+        .strategy-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .strategy-card:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+        }
+
+        .strategy-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .strategy-header:hover {
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .strategy-type {
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .strategy-toggle {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: var(--accent-blue);
+            transition: transform 0.3s ease;
+        }
+
+        .strategy-toggle.open {
+            transform: rotate(180deg);
+        }
+
+        .strategy-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding: 0 16px;
+        }
+
+        .strategy-content.open {
+            max-height: 1000px;
+            padding: 16px;
+        }
+
+        .strategy-section {
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--accent-blue);
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+
+        .section-content {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-left: 12px;
+        }
+
+        .setup-box {
+            background: rgba(0, 212, 255, 0.05);
+            padding: 8px 12px;
+            border-left: 2px solid var(--accent-blue);
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 8px 0;
+        }
+
+        .call-box {
+            background: rgba(255, 51, 85, 0.05);
+            padding: 8px 12px;
+            border-left: 2px solid var(--accent-red);
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 8px 0;
+        }
+
+        .bullet-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .bullet-list li {
+            padding: 4px 0;
+            padding-left: 16px;
+            position: relative;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .bullet-list li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: var(--accent-blue);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 24px;
+            border-top: 2px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 12px;
+            margin-top: 40px;
+        }
+
+        :root {
+            --bg-dark: #090d1a;
+            --bg-card: #111a2c;
+            --border-color: #263653;
+            --accent-blue: #37d5c3;
+            --accent-red: #ff7a59;
+            --text-primary: #f4f7fb;
+            --text-secondary: #9ba9bd;
+            --ct-color: #62a0ff;
+            --tr-color: #ff996f;
+            --shadow: 0 18px 60px rgba(0, 0, 0, .24);
+        }
+
+        body { font-family: "Trebuchet MS", "Segoe UI", sans-serif; background: radial-gradient(circle at 10% 0%, #19324b 0, transparent 34%), linear-gradient(145deg, #080c17, #101b2a 55%, #111827); }
+        button, input, textarea, select { font: inherit; }
+        button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid var(--accent-blue); outline-offset: 3px; }
+        .container { max-width: 1480px; }
+        header { border-bottom: 1px solid var(--border-color); }
+        h1 { font-size: clamp(32px, 5vw, 58px); letter-spacing: .04em; text-transform: uppercase; }
+        .subtitle { max-width: 700px; }
+        .topbar, .toolbar, .community-head { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+        .topbar { margin-bottom: 24px; }
+        .eyebrow { color: var(--accent-blue); font-size: 11px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+        .controls { display: flex; gap: 8px; flex-wrap: wrap; }
+        .control, .primary-btn { border: 1px solid var(--border-color); border-radius: 6px; padding: 10px 13px; background: rgba(17, 26, 44, .9); color: var(--text-primary); cursor: pointer; }
+        .primary-btn { background: var(--accent-blue); color: #06151a; border-color: var(--accent-blue); font-weight: 800; }
+        .control:hover, .primary-btn:hover { transform: translateY(-1px); filter: brightness(1.08); }
+        .toolbar { margin: 16px 0 20px; }
+        .search { min-width: min(360px, 100%); flex: 1; padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 6px; background: #0c1423; color: var(--text-primary); }
+        .map-selector { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); }
+        .map-btn { border-radius: 6px; background: rgba(17, 26, 44, .8); }
+        .map-btn.active { background: var(--accent-blue); box-shadow: 0 0 24px rgba(55, 213, 195, .28); }
+        .map-header, .strategy-card, .community-panel { box-shadow: var(--shadow); }
+        .map-header { border-left-width: 3px; background: linear-gradient(100deg, rgba(17, 26, 44, .98), rgba(20, 37, 53, .75)); }
+        .strategy-card { border-radius: 6px; }
+        .strategy-header { padding: 14px 16px; }
+        .strategy-card.favorite { border-color: #f5c451; }
+        .strategy-card.hidden { display: none; }
+        .strategy-meta { display: flex; align-items: center; gap: 8px; }
+        .favorite-btn { border: 0; background: transparent; color: #f5c451; cursor: pointer; font-size: 18px; }
+        .community-panel { margin-top: 26px; padding: 22px; border-top: 2px solid var(--accent-red); background: rgba(17, 26, 44, .88); }
+        .community-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-top: 16px; }
+        .community-card { padding: 15px; border: 1px solid var(--border-color); border-radius: 6px; background: #0d1625; }
+        .community-card h3 { color: var(--accent-blue); margin-bottom: 6px; }
+        .community-card p { color: var(--text-secondary); font-size: 13px; white-space: pre-wrap; }
+        .modal { position: fixed; inset: 0; display: none; place-items: center; padding: 20px; background: rgba(3, 7, 14, .78); z-index: 4; }
+        .modal.open { display: grid; }
+        .modal-box { width: min(580px, 100%); padding: 24px; border: 1px solid var(--border-color); border-radius: 8px; background: #111a2c; box-shadow: var(--shadow); }
+        .form-grid { display: grid; gap: 12px; margin: 18px 0; }
+        .form-grid label { display: grid; gap: 6px; color: var(--text-secondary); font-size: 12px; font-weight: 700; text-transform: uppercase; }
+        .form-grid input, .form-grid textarea, .form-grid select { width: 100%; padding: 11px; border: 1px solid var(--border-color); border-radius: 5px; background: #0b1321; color: var(--text-primary); }
+        .form-grid textarea { min-height: 110px; resize: vertical; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 8px; }
+        @media (max-width: 600px) { .container { padding: 16px; } .map-selector { grid-template-columns: repeat(2, 1fr); } .topbar { align-items: flex-start; } }
+    </style>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="topbar">
+                <div>
+                    <div class="eyebrow">Bueno / Competitive Lab</div>
+                    <h1>CS2 Playbook</h1>
+                    <p class="subtitle" id="subtitle">Estratégias por mapa. Decisões rápidas para a sua partida.</p>
+                </div>
+                <div class="controls">
+                    <select class="control" id="language" aria-label="Idioma">
+                        <option value="pt">PT-BR</option>
+                        <option value="es">ES</option>
+                        <option value="en">EN</option>
+                    </select>
+                    <button class="control" id="communityButton" type="button">＋ <span id="communityLabel">Publicar estratégia</span></button>
+                </div>
+            </div>
+            <section class="map-pool" aria-labelledby="poolTitle">
+                <div class="pool-title">
+                    <div><strong id="poolTitle">Map pool da partida</strong><span class="pool-hint" id="poolHint">Clique nos mapas para colocar ou tirar do pool competitivo.</span></div>
+                    <div class="pool-status"><span class="status-key active-key">● <span id="activeLabel">ATIVO</span></span><span class="status-key out-key">● <span id="outLabel">FORA</span></span><span class="pool-count" id="poolCount">0/7 selecionados</span></div>
+                </div>
+                <div class="pool-grid" id="poolGrid"></div>
+            </section>
+            <div class="toolbar">
+                <input class="search" id="search" type="search" placeholder="Buscar setups, calls ou posições..." aria-label="Buscar estratégias">
+                <div class="controls">
+                    <button class="control filter active" data-side="all" type="button">Todos <span class="filter-count">0</span></button>
+                    <button class="control filter" data-side="ct" type="button">CT <span class="filter-count">0</span></button>
+                    <button class="control filter" data-side="tr" type="button">TR <span class="filter-count">0</span></button>
+                </div>
+            </div>
+            <div class="map-selector" id="mapSelector"></div>
+        </header>
+
+        <div id="content">
+            <div class="empty-state">
+                <div class="empty-state-icon">⌁</div>
+                <p id="emptyText">Selecione um mapa para ver as estratégias</p>
+            </div>
+        </div>
+
+        <section class="community-panel" aria-labelledby="communityTitle">
+            <div class="community-head">
+                <div><div class="eyebrow">Squad knowledge base</div><h2 id="communityTitle">Estratégias da comunidade</h2></div>
+                <span class="subtitle" id="communityHint">Salvas neste navegador e disponíveis offline.</span>
+            </div>
+            <div class="community-list" id="communityList"></div>
+        </section>
+
+        <div class="footer">
+            <p>CS2 Playbook • <span id="footerText">Desenvolvido por Bueno</span> • 2026 · Ícones por <a href="https://github.com/MurkyYT/cs2-map-icons" target="_blank" rel="noopener noreferrer">CS2 Map Icons</a></p>
+        </div>
+    </div>
+
+    <div class="modal" id="communityModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-box">
+            <div class="community-head"><h2 id="modalTitle">Publicar estratégia</h2><button class="control" id="closeModal" type="button">×</button></div>
+            <form id="communityForm" class="form-grid">
+                <label>Nome da estratégia <input id="strategyName" required maxlength="60" placeholder="Ex.: Anti-rush B" /></label>
+                <label>Mapa <select id="strategyMap" required></select></label>
+                <label>Lado <select id="strategySide"><option value="ct">CT</option><option value="tr">TR</option></select></label>
+                <label>Plano <textarea id="strategyPlan" required maxlength="500" placeholder="Setup, utilitárias, timing e condição de saída..."></textarea></label>
+                <div class="modal-actions"><button class="control" id="cancelModal" type="button">Cancelar</button><button class="primary-btn" type="submit">Salvar no banco local</button></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const playbook = {
+            ancient: {
+                name: 'ANCIENT',
+                mainPoints: 'Controle de Mid/Donut. Quem controla essa região consegue pressionar os dois bombsites e facilitar as rotações.',
+                ct: {
+                    pistol: {
+                        setup: '2 Mid/Donut + 1 A + 2 B',
+                        points: [
+                            '2 jogadores entram para pegar Mid rapidamente',
+                            '1 A segura entrada/retake',
+                            '2 B seguram Cave e entrada principal',
+                            'Se ganhar Mid, um CT pode recuar para ajudar A ou B',
+                            'Evitar avançar sozinho em Cave'
+                        ],
+                        call: '2 MID, 1 A, 2 B. Joga pela informação.'
+                    },
+                    eco: {
+                        setup: 'Stack B/Cave',
+                        points: [
+                            '3 jogadores juntos em B/Cave',
+                            '2 jogadores próximos de Donut',
+                            'Procurar contato em curta distância',
+                            'Se matar o primeiro TR, pegar a arma e recuar',
+                            'Não tentar defender o bombsite aberto sozinho'
+                        ],
+                        variation: '4 jogadores escondidos em B + 1 Donut'
+                    },
+                    force: {
+                        setup: 'Setup agressivo',
+                        points: [
+                            '3 jogadores pressionam Mid',
+                            '2 jogadores seguram B',
+                            'Usar SMG/shotgun onde possível',
+                            'Procurar primeira kill e transformar em vantagem numérica'
+                        ],
+                        call: 'MID FORCE — pega primeiro contato e recua'
+                    },
+                    stack: {
+                        setup: 'STACK B — 5 B',
+                        points: [
+                            '3 escondidos para primeiro contato',
+                            '2 preparados para o segundo contato',
+                            'Não revelar os 5 jogadores de uma vez',
+                            'Se TR não vier B até ~0:45, 1 jogador sai para informação'
+                        ]
+                    },
+                    fake: {
+                        setup: 'Fake de B para A',
+                        points: [
+                            '3 jogadores fazem barulho/utility em B',
+                            '2 ficam escondidos',
+                            'Após contato, os jogadores de B recuam rapidamente para A',
+                            'Objetivo é fazer os TR acreditarem que B está sendo atacado'
+                        ]
+                    },
+                    default: {
+                        setup: '2 Mid + 1 A + 2 B',
+                        points: [
+                            'Mid trabalha informação',
+                            'A não entrega kill de graça',
+                            'B segura Cave',
+                            'Depois de identificar onde estão os CTs, juntar 3 jogadores e executar'
+                        ],
+                        executions: ['Mid → Donut → A', 'Mid → B', 'Cave → B']
+                    }
+                },
+                tr: {
+                    pistol: {
+                        setup: '2 Mid + 2 Cave + 1 suporte',
+                        points: [
+                            'Entrar Mid com flashes',
+                            'Depois do controle, juntar 4 jogadores para B',
+                            '1 fica segurando rotação/CT'
+                        ],
+                        call: 'Pega MID, junta B'
+                    },
+                    eco: {
+                        setup: 'Rush B/Cave',
+                        points: [
+                            '5 jogadores juntos',
+                            'Objetivo é eliminar o primeiro CT e pegar arma',
+                            'Se conseguir uma kill + arma, parar o rush e jogar o 5v4'
+                        ]
+                    },
+                    force: {
+                        setup: 'Fast Mid',
+                        points: [
+                            '3 Mid',
+                            '2 Cave',
+                            'Flash para tirar CT de posição',
+                            'Procurar primeira kill',
+                            'Se Mid abrir, split B'
+                        ]
+                    },
+                    stack: {
+                        setup: '5 B',
+                        points: [
+                            '3 Cave',
+                            '2 Mid/entrada B',
+                            'Flash inicial',
+                            'Entrar todos juntos',
+                            'Não separar depois da primeira kill'
+                        ]
+                    },
+                    fake: {
+                        setup: 'Fake B → A',
+                        points: [
+                            '3 jogadores fazem pressão em B',
+                            '2 ficam Mid',
+                            'Utilizar smoke/flash para simular execução',
+                            'CTs devem começar a rotacionar',
+                            'Mid entra Donut e A',
+                            'Finalizar A com 3–4 jogadores'
+                        ]
+                    },
+                    default: {
+                        setup: '2 Mid + 1 A + 2 B',
+                        points: [
+                            'Mid é prioridade',
+                            'Não gastar todas as granadas no início',
+                            'Procurar pick',
+                            'Depois de ganhar Mid, decidir entre as opções'
+                        ],
+                        executions: ['Donut → A', 'Mid → B', 'Cave → B']
+                    }
+                }
+            },
+            mirage: {
+                name: 'MIRAGE',
+                mainPoints: 'Mid é o coração do mapa. Window, Connector e Short permitem dividir A, enquanto Apps é a principal pressão sobre B. Mirage apresenta uma das maiores vantagens CT nos dados atuais.',
+                ct: {
+                    pistol: {
+                        setup: '2 Mid + 1 A + 2 B',
+                        points: [
+                            '1 Window',
+                            '1 Connector',
+                            '1 A',
+                            '2 B',
+                            'Não entregar Mid',
+                            'Se ganhar Mid, CT ganha informação dos dois lados'
+                        ]
+                    },
+                    eco: {
+                        setup: 'Stack B',
+                        points: [
+                            '4 B',
+                            '1 Mid',
+                            'Esperar Apps',
+                            'Jogar para troca'
+                        ]
+                    },
+                    force: {
+                        setup: '3 Mid agressivos',
+                        points: [
+                            '3 Mid',
+                            '1 A',
+                            '1 B',
+                            'Flash para pegar informação',
+                            'Procurar primeiro pick'
+                        ]
+                    },
+                    stack: {
+                        setup: '5 B',
+                        points: [
+                            '3 escondidos B',
+                            '2 Apps',
+                            'Deixar TR entrar',
+                            'Explodir todos juntos'
+                        ]
+                    },
+                    fake: {
+                        setup: 'Gamble A',
+                        points: [
+                            '4 A',
+                            '1 B',
+                            'Mostrar muita presença A',
+                            'Se TR começar B, rotacionar'
+                        ]
+                    },
+                    default: {
+                        setup: '1 A + 2 Mid + 2 B',
+                        points: [
+                            'Window/Connector devem trabalhar informação',
+                            'Não avançar sem necessidade',
+                            'Guardar smoke para execução'
+                        ]
+                    }
+                },
+                tr: {
+                    pistol: {
+                        setup: '3 Mid + 2 Ramp',
+                        points: [
+                            'Tomar Mid',
+                            '1 entra Connector',
+                            '2 Cat',
+                            'Ramp entra junto',
+                            'Explodir A'
+                        ],
+                        call: 'Mid → A Split'
+                    },
+                    eco: {
+                        setup: 'Rush B Apps',
+                        points: [
+                            '5 Apps',
+                            'Flash',
+                            'Entrar B',
+                            'Procurar kill/plant',
+                            'Se pegar arma, parar de correr'
+                        ]
+                    },
+                    force: {
+                        setup: 'Fast Mid',
+                        points: [
+                            '4 Mid',
+                            '1 Underpass',
+                            'Flash Window',
+                            'Tomar Mid',
+                            'Split A'
+                        ]
+                    },
+                    stack: {
+                        setup: '5 A Ramp',
+                        points: [
+                            'Todos Ramp',
+                            'Flash',
+                            'Entrada simultânea',
+                            'Não parar na Ramp'
+                        ]
+                    },
+                    fake: {
+                        setup: 'Fake A → B',
+                        points: [
+                            '3 Ramp + Mid fazendo barulho',
+                            'CTs devem rotacionar',
+                            '2 jogadores permanecem Underpass/Apps',
+                            'Voltar para B com 4–5'
+                        ]
+                    },
+                    default: {
+                        setup: '2 A Ramp + 2 Mid + 1 B Apps',
+                        points: [
+                            'Mid é prioridade',
+                            'A controla Ramp',
+                            'B mantém Apps'
+                        ],
+                        executions: ['Mid → A', 'Apps → B', 'Fake A → B']
+                    }
+                }
+            },
+            dust2: {
+                name: 'DUST II',
+                mainPoints: 'Long, Mid e Cat são as três áreas que mais definem as opções do TR. É um mapa em que AWP e duelos de longa distância têm bastante peso.',
+                ct: {
+                    pistol: {
+                        setup: '1 Long + 2 Mid + 1 Cat + 1 B',
+                        points: [
+                            'Tem que brigar pela Varanda',
+                            'Mid joga para informação',
+                            'B não pode morrer sozinho',
+                            'Se TR perder Long, CT ganha enorme espaço'
+                        ]
+                    },
+                    eco: {
+                        setup: 'Stack B',
+                        points: [
+                            '4 B',
+                            '1 Short/Mid',
+                            'Esperar rush',
+                            'Utilizar pistolas em curta distância',
+                            'Depois pegar armas e recuar'
+                        ]
+                    },
+                    force: {
+                        setup: 'Double Long',
+                        points: [
+                            '2 Long avançam',
+                            '2 Mid',
+                            '1 B',
+                            'Objetivo é impedir controle Long'
+                        ]
+                    },
+                    stack: {
+                        setup: '5 B',
+                        points: [
+                            'Excelente contra B rush',
+                            'Não dar kill isolada',
+                            'Todos devem jogar próximos'
+                        ]
+                    },
+                    fake: {
+                        setup: 'Gamble Long',
+                        points: [
+                            '3 CTs Long',
+                            '2 B',
+                            'Fazer pressão Long',
+                            'Se TR demonstrar B, rotacionar'
+                        ]
+                    },
+                    default: {
+                        setup: '1 Long + 2 Mid/Cat + 1 A + 1 B',
+                        points: [
+                            'Tem que brigar pela Varanda',
+                            'Mid busca informação',
+                            'B segura rush'
+                        ]
+                    }
+                },
+                tr: {
+                    pistol: {
+                        setup: '3 Long + 2 Short/Mid',
+                        points: [
+                            'Ganhar Long',
+                            'Flash para entrar',
+                            'Plantar A',
+                            'Pós-plant espalhado'
+                        ],
+                        call: 'Long → A'
+                    },
+                    eco: {
+                        setup: 'Rush B',
+                        points: [
+                            '5 B Tunnels',
+                            'Flash',
+                            'Entrar rápido',
+                            'Plantar',
+                            'Tentar pegar armas'
+                        ]
+                    },
+                    force: {
+                        setup: 'Fast Long',
+                        points: [
+                            '4 Long',
+                            '1 Short',
+                            'Tomar Long',
+                            'Smoke CT/Cross',
+                            'Executar A'
+                        ]
+                    },
+                    stack: {
+                        setup: '5 B',
+                        points: [
+                            'Todos B Tunnels',
+                            'Flash',
+                            'Primeiro abre',
+                            'Restante troca'
+                        ]
+                    },
+                    fake: {
+                        setup: 'Fake Long → B',
+                        points: [
+                            '3 jogadores Long',
+                            '2 ficam Mid',
+                            'Fazer CTs rotacionarem',
+                            'Recuar Long',
+                            'Entrar B'
+                        ]
+                    },
+                    default: {
+                        setup: '2 Long + 2 Mid + 1 B',
+                        points: [
+                            'Long busca controle',
+                            'Mid busca pick',
+                            'B segura CTs presos no site'
+                        ],
+                        executions: ['A split', 'B']
+                    }
+                }
+            },
+            anubis: {
+                name: 'ANUBIS',
+                mainPoints: 'Mid/Water e as conexões rápidas entre os lados tornam informação e rotação muito importantes. Anubis também tem forte potencial de ataque pelo lado TR.',
+                ct: {
+                    pistol: {
+                        setup: '2 Mid/Water + 1 A + 2 B',
+                        points: [
+                            'Entrem para pegar Mid rapidamente',
+                            'Um dos jogadores de B pode jogar mais recuado',
+                            'Evitar morrer primeiro em Water',
+                            'Se houver contato B, rotação rápida'
+                        ]
+                    },
+                    eco: {
+                        setup: 'Stack B',
+                        points: [
+                            '4 B',
+                            '1 Mid',
+                            'Jogadores B ficam próximos para trocar kills',
+                            'Se conseguirem uma arma, recuar'
+                        ]
+                    },
+                    force: {
+                        setup: 'Pressão Mid',
+                        points: [
+                            '3 Mid',
+                            '1 A',
+                            '1 B',
+                            'Procurar primeira kill',
+                            'Depois da kill, recuar e jogar 4v5'
+                        ]
+                    },
+                    stack: {
+                        setup: '5 B',
+                        points: [
+                            'Esperar o rush',
+                            'Não entregar todos os jogadores de uma vez',
+                            'Primeiro contato → todos entram',
+                            'Objetivo é destruir o ataque rapidamente'
+                        ]
+                    },
+                    fake: {
+                        setup: 'Gamble A → B',
+                        points: [
+                            '3 CTs mostram presença A',
+                            '2 ficam B',
+                            'Após perceber pressão TR em A, rotacionar rapidamente',
+                            'Usar utility para atrasar a entrada B'
+                        ]
+                    },
+                    default: {
+                        setup: '2 Mid + 1 A + 2 B',
+                        points: [
+                            'Mid disputa informação',
+                            'A segura avanço',
+                            'B evita push desnecessário',
+                            'Após informação, rotacionar um jogador'
+                        ]
+                    }
+                },
+                tr: {
+                    pistol: {
+                        setup: '2 Water + 2 Mid + 1 suporte',
+                        points: [
+                            'Pegar controle de Mid',
+                            'Smoke/flash para cortar CT',
+                            'Split A'
+                        ],
+                        call: 'MID CONTROL, SPLIT A'
+                    },
+                    eco: {
+                        setup: 'Rush B',
+                        points: [
+                            '5 juntos',
+                            'Flash de entrada',
+                            'Entrar B imediatamente',
+                            'Plantar',
+                            'Mesmo que perca, buscar kills/plant'
+                        ]
+                    },
+                    force: {
+                        setup: 'Fast Water',
+                        points: [
+                            '3 Water',
+                            '2 Mid',
+                            'Tomar espaço rapidamente',
+                            'Depois juntar B',
+                            'Não ficar parado procurando duelinho'
+                        ]
+                    },
+                    stack: {
+                        setup: '5 B',
+                        points: [
+                            'Todos B',
+                            'Utilidade inicial',
+                            'Entrada simultânea',
+                            '1 jogador procura kill inicial',
+                            'Restante troca'
+                        ]
+                    },
+                    fake: {
+                        setup: 'Fake B → A',
+                        points: [
+                            '3 B fazem barulho',
+                            '2 Mid',
+                            'Esperar CTs mostrarem rotação',
+                            'Voltar Mid → A',
+                            'Execução rápida'
+                        ]
+                    },
+                    default: {
+                        setup: '2 Mid/Water + 1 A + 2 B',
+                        points: [
+                            'Procurar informação',
+                            'Controlar Mid',
+                            'Fazer CTs gastarem utility',
+                            'Depois escolher A/B'
+                        ]
+                    }
+                }
+            },
+            cache: {
+                name: 'CACHE',
+                mainPoints: 'Mid é extremamente importante. A Cache atual entrou na rotação em julho de 2026 e os dados iniciais mostram leve vantagem CT.',
+                ct: {
+                    pistol: {
+                        setup: '2 Mid + 1 A + 2 B',
+                        points: [
+                            'Pegar contato no Mid',
+                            'Um jogador pode avançar para informação',
+                            'B joga para troca',
+                            'A não deve ficar completamente sozinho sem informação'
+                        ]
+                    },
+                    eco: {
+                        setup: '4 B + 1 Mid',
+                        points: [
+                            'B em posições próximas',
+                            'Esperar rush',
+                            'Primeiro jogador faz contato',
+                            'Os outros entram para troca',
+                            'Mid tenta pegar arma de quem passar'
+                        ]
+                    },
+                    force: {
+                        setup: 'Agressão Mid',
+                        points: [
+                            '3 Mid',
+                            '1 A',
+                            '1 B',
+                            'Flash para avançar',
+                            'Buscar kill',
+                            'Recuar depois da vantagem'
+                        ]
+                    },
+                    stack: {
+                        setup: '5 B',
+                        points: [
+                            'Muito eficiente contra rush B',
+                            'Não revelar todos imediatamente',
+                            'Primeiro contato → explosão dos 5'
+                        ]
+                    },
+                    fake: {
+                        setup: 'Gamble A',
+                        points: [
+                            '3 jogadores fazem pressão A',
+                            '2 seguram B',
+                            'Se os TRs mostrarem presença A, recuar e preparar retake/rotação',
+                            'Se houver silêncio, voltar para setup padrão'
+                        ]
+                    },
+                    default: {
+                        setup: '2 Mid + 1 A + 2 B',
+                        points: [
+                            'Não entregar o Mid',
+                            'Não entregar Highway gratuitamente',
+                            'Após identificar o lado TR, ajustar setup'
+                        ]
+                    }
+                },
+                tr: {
+                    pistol: {
+                        setup: '2 Mid + 2 A Main + 1 suporte',
+                        points: [
+                            'Tomar Mid',
+                            'Smoke/flash',
+                            'Split A por Mid + A Main'
+                        ],
+                        call: 'Mid → A'
+                    },
+                    eco: {
+                        setup: 'Rush B',
+                        points: [
+                            '5 B',
+                            'Utilidade curta',
+                            'Entrar rápido',
+                            'Não parar para procurar kills',
+                            'Plantou = espalhar para pós-plant'
+                        ]
+                    },
+                    force: {
+                        setup: 'Fast Mid',
+                        points: [
+                            '3 Mid',
+                            '2 A Main',
+                            'Tomar Mid',
+                            'Se ganhar espaço → A',
+                            'Se perder Mid → voltar e executar B'
+                        ]
+                    },
+                    stack: {
+                        setup: '5 A',
+                        points: [
+                            'A Main',
+                            'Flash',
+                            'Entrar todos',
+                            'Um jogador abre, quatro trocam'
+                        ]
+                    },
+                    fake: {
+                        setup: 'Fake A → B',
+                        points: [
+                            '3 A Main',
+                            '2 Mid',
+                            'Fazer CTs gastarem utility/rotacionarem',
+                            'Recuar',
+                            'B com 4–5 jogadores'
+                        ]
+                    },
+                    default: {
+                        setup: '2 Mid / 2 A / 1 B',
+                        points: [
+                            'Mid busca controle',
+                            'A segura espaço',
+                            'B trabalha informação'
+                        ],
+                        executions: ['Mid + A → A', 'Mid + B → B']
+                    }
+                }
+            },
+            inferno: {
+                name: 'INFERNO',
+                mainPoints: 'Banana é o território mais importante para o B, enquanto Mid/Apps define boa parte das execuções A. Utility e timing têm muito peso.',
+                ct: {
+                    pistol: {
+                        setup: '2 Banana + 2 Mid + 1 B',
+                        points: [
+                            '2 Banana brigam pelo espaço',
+                            '2 Mid/Apps',
+                            '1 B',
+                            'Depois da primeira informação, ajustar'
+                        ]
+                    },
+                    eco: {
+                        setup: '4 B',
+                        points: [
+                            'Esperar rush',
+                            'Jogar próximos',
+                            'SMG/shotgun se disponível',
+                            'Procurar troca'
+                        ]
+                    },
+                    force: {
+                        setup: 'Banana agressiva',
+                        points: [
+                            '3 Banana',
+                            '2 A',
+                            'Procurar primeira kill',
+                            'Depois recuar'
+                        ]
+                    },
+                    stack: {
+                        setup: '5 B',
+                        points: [
+                            'Muito forte contra B rush',
+                            'Jogar escondido',
+                            'Esperar entrada',
+                            'Não morrer sozinho'
+                        ]
+                    },
+                    fake: {
+                        setup: 'Gamble B',
+                        points: [
+                            '4 B',
+                            '1 A',
+                            'Mostrar presença B',
+                            'Se TR não aparecer, 2–3 retornam A'
+                        ]
+                    },
+                    default: {
+                        setup: '2 Banana + 1 Arch/CT + 2 A',
+                        points: [
+                            'Tem que brigar pela Banana',
+                            'A joga passivo',
+                            'Evitar morrer Apps',
+                            'Guardar utility para impedir execução'
+                        ]
+                    }
+                },
+                tr: {
+                    pistol: {
+                        setup: '4 Banana + 1 Mid/Apps',
+                        points: [
+                            'Flash',
+                            'Entrar B',
+                            'Plantar',
+                            'Pós-plant jogar retake difícil para CT'
+                        ],
+                        call: 'Banana Rush'
+                    },
+                    eco: {
+                        setup: '5 Apps',
+                        points: [
+                            'Entrar Apartments',
+                            'Procurar kills',
+                            'Se matar A player, pegar arma',
+                            'Evitar ficar espalhado'
+                        ]
+                    },
+                    force: {
+                        setup: 'Fast Banana',
+                        points: [
+                            '5 Banana',
+                            'Utilidade rápida',
+                            'Se ganhar Banana → B',
+                            'Se CTs estiverem muito fortes → recuar e fazer A'
+                        ]
+                    },
+                    stack: {
+                        setup: '5 A',
+                        points: [
+                            '3 Apps',
+                            '2 Mid',
+                            'Executar A rapidamente',
+                            'Não deixar CTs reorganizarem'
+                        ]
+                    },
+                    fake: {
+                        setup: 'Fake B → A',
+                        points: [
+                            '4 Banana',
+                            'Molotov/smoke para parecer execução',
+                            'Recuar',
+                            '3–4 jogadores fazem A'
+                        ]
+                    },
+                    default: {
+                        setup: '2 Banana + 2 Mid + 1 Apps',
+                        points: [
+                            'Banana lentamente',
+                            'Mid busca informação',
+                            'Apps controla espaço'
+                        ],
+                        executions: ['B split', 'A Short/Long', 'A Apps']
+                    }
+                }
+            },
+            nuke: {
+                name: 'NUKE',
+                mainPoints: 'Nuke depende muito de controle de Outside e das rotações verticais. É um mapa naturalmente mais favorável ao CT, então o TR precisa conquistar espaço sem perder jogadores gratuitamente.',
+                ct: {
+                    pistol: {
+                        setup: '1 Outside + 2 Ramp + 2 A/Hut',
+                        points: [
+                            'Outside pega informação',
+                            'Ramp controla acesso ao Lower',
+                            '2 jogadores protegem A',
+                            'Evitar avançar demais Outside'
+                        ]
+                    },
+                    eco: {
+                        setup: 'Stack Ramp',
+                        points: [
+                            '4 Ramp',
+                            '1 Outside',
+                            'Esperar entrada',
+                            'Jogar em curta distância'
+                        ]
+                    },
+                    force: {
+                        setup: 'Agressão Outside',
+                        points: [
+                            '3 Outside',
+                            '1 Ramp',
+                            '1 A',
+                            'Procurar primeira kill',
+                            'Recuar'
+                        ]
+                    },
+                    stack: {
+                        setup: '5 Ramp',
+                        points: [
+                            'Todos Ramp',
+                            'Esperar descida',
+                            'Primeiro contato → todos atacam',
+                            'Excelente contra execução Lower'
+                        ]
+                    },
+                    fake: {
+                        setup: 'Gamble Lower',
+                        points: [
+                            '4 jogadores preparados para Lower',
+                            '1 A',
+                            'Se TR demonstrar Outside/Ramp, ajustar',
+                            'Objetivo é fazer o TR acreditar que Lower está aberto'
+                        ]
+                    },
+                    default: {
+                        setup: '1 Outside + 2 A + 2 Ramp/Lower',
+                        points: [
+                            'Outside busca informação',
+                            'Ramp controla descida',
+                            'A segura Hut/Squeaky',
+                            'Não dar pick gratuito Outside'
+                        ]
+                    }
+                },
+                tr: {
+                    pistol: {
+                        setup: '3 Outside + 2 Ramp',
+                        points: [
+                            'Tomar Outside',
+                            'Entrar Secret',
+                            'Descer B',
+                            'Plantar',
+                            '1 jogador fica controlando rotação'
+                        ],
+                        call: 'Outside → Secret → B'
+                    },
+                    eco: {
+                        setup: 'Rush Ramp',
+                        points: [
+                            '5 Ramp',
+                            'Flash',
+                            'Descer juntos',
+                            'Buscar kills',
+                            'Plantar se possível'
+                        ]
+                    },
+                    force: {
+                        setup: 'Fast Outside',
+                        points: [
+                            '3 Outside',
+                            '2 Hut',
+                            'Tomar Secret',
+                            'Fazer split B'
+                        ]
+                    },
+                    stack: {
+                        setup: '5 Ramp',
+                        points: [
+                            'Todos Ramp',
+                            'Flash',
+                            'Entrar juntos',
+                            'Primeiro jogador abre',
+                            'Restante troca'
+                        ]
+                    },
+                    fake: {
+                        setup: 'Fake Outside → A',
+                        points: [
+                            '3 Outside',
+                            '2 Hut/Squeaky',
+                            'Fazer CTs acreditarem em B',
+                            'Recuar Secret',
+                            'Entrar A pelo Hut/Squeaky'
+                        ]
+                    },
+                    default: {
+                        setup: '3 Outside + 1 Ramp + 1 Lobby',
+                        points: [
+                            'Outside busca controle',
+                            'Ramp busca informação',
+                            'Lobby mantém pressão A'
+                        ],
+                        executions: ['Outside → Secret → B', 'Ramp → B', 'Fake B → A']
+                    }
+                }
+            }
+        };
+
+        const maps = Object.values(playbook);
+        const strategyTypes = ['pistol', 'eco', 'force', 'stack', 'fake', 'default'];
+        const state = { language: localStorage.getItem('cs2-language') || 'pt', map: 'ancient', side: 'all', query: '', pool: new Set(JSON.parse(localStorage.getItem('cs2-map-pool') || JSON.stringify(Object.keys(playbook)))) };
+        if (!state.pool.size) state.pool.add('ancient');
+        if (!state.pool.has(state.map)) state.map = [...state.pool][0];
+        const favorites = new Set(JSON.parse(localStorage.getItem('cs2-favorites') || '[]'));
+        const i18n = {
+            pt: { subtitle: 'Estratégias por mapa. Decisões rápidas para a sua partida.', publish: 'Publicar estratégia', all: 'Todos', empty: 'Selecione um mapa para ver as estratégias', community: 'Estratégias da comunidade', hint: 'Salvas neste navegador e disponíveis offline.', poolTitle: 'Map pool da partida', poolHint: 'Clique nos mapas para colocar ou tirar do pool competitivo.', active: 'ATIVO', out: 'FORA', call: 'Call', variation: 'Variação', executions: 'Execuções', ct: 'Contra-terroristas', tr: 'Terroristas', saved: 'Estratégia salva no banco local', noCommunity: 'Ainda não há estratégias publicadas. Seja o primeiro a compartilhar uma ideia.' },
+            es: { subtitle: 'Estrategias por mapa. Decisiones rápidas para tu partida.', publish: 'Publicar estrategia', all: 'Todos', empty: 'Selecciona un mapa para ver las estrategias', community: 'Estrategias de la comunidad', hint: 'Guardadas en este navegador y disponibles sin conexión.', poolTitle: 'Map pool de la partida', poolHint: 'Haz clic en los mapas para incluirlos o quitarlos del pool competitivo.', active: 'ACTIVO', out: 'FUERA', call: 'Call', variation: 'Variación', executions: 'Ejecuciones', ct: 'Contra-terroristas', tr: 'Terroristas', saved: 'Estrategia guardada en la base local', noCommunity: 'Todavía no hay estrategias publicadas. Sé el primero en compartir una idea.' },
+            en: { subtitle: 'Strategies by map. Fast decisions for your next match.', publish: 'Publish strategy', all: 'All', empty: 'Select a map to view strategies', community: 'Community strategies', hint: 'Saved in this browser and available offline.', poolTitle: 'Match map pool', poolHint: 'Click maps to add or remove them from the competitive pool.', active: 'ACTIVE', out: 'OUT', call: 'Call', variation: 'Variation', executions: 'Executions', ct: 'Counter-terrorists', tr: 'Terrorists', saved: 'Strategy saved to the local database', noCommunity: 'No strategies yet. Be the first to share an idea.' }
+        };
+        const mapLabels = { ancient: { pt: 'ANCIENT', es: 'ANCIENT', en: 'ANCIENT' }, mirage: { pt: 'MIRAGE', es: 'MIRAGE', en: 'MIRAGE' }, dust2: { pt: 'DUST II', es: 'DUST II', en: 'DUST II' }, anubis: { pt: 'ANUBIS', es: 'ANUBIS', en: 'ANUBIS' }, cache: { pt: 'CACHE', es: 'CACHE', en: 'CACHE' }, inferno: { pt: 'INFERNO', es: 'INFERNO', en: 'INFERNO' }, nuke: { pt: 'NUKE', es: 'NUKE', en: 'NUKE' } };
+        const mapImages = { ancient: 'https://raw.githubusercontent.com/MurkyYT/cs2-map-icons/main/images/de_ancient.png', mirage: 'https://raw.githubusercontent.com/MurkyYT/cs2-map-icons/main/images/de_mirage.png', dust2: 'https://raw.githubusercontent.com/MurkyYT/cs2-map-icons/main/images/de_dust2.png', anubis: 'https://raw.githubusercontent.com/MurkyYT/cs2-map-icons/main/images/de_anubis.png', cache: 'https://raw.githubusercontent.com/MurkyYT/cs2-map-icons/main/images/de_cache.png', inferno: 'https://raw.githubusercontent.com/MurkyYT/cs2-map-icons/main/images/de_inferno.png', nuke: 'https://raw.githubusercontent.com/MurkyYT/cs2-map-icons/main/images/de_nuke.png' };
+        const mapTones = { ancient: '#34453f', mirage: '#5a4834', dust2: '#695137', anubis: '#55473a', cache: '#3b503f', inferno: '#603c2d', nuke: '#3d5154' };
+        const ptCallouts = {
+            ancient: { Donut: 'Rosquinha', Cave: 'Escuro' },
+            mirage: { Underpass: 'Caverna', Connector: 'Liga', Window: 'Janela' },
+            dust2: { Long: 'Varanda', Cat: 'Rampa', Short: 'Rampa' },
+            cache: { Highway: 'Xaromba' }
+        };
+        const text = value => {
+            let result = String(value);
+            if (state.language === 'pt') {
+                const callouts = ptCallouts[state.map] || {};
+                Object.entries(callouts).forEach(([source, callout]) => {
+                    result = result.replace(new RegExp(`\\b${source}\\b`, 'g'), callout);
+                });
+            }
+            return result.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        };
+        const t = key => i18n[state.language][key];
+        const mapKey = map => Object.keys(playbook).find(key => playbook[key] === map) || map;
+
+        function renderPool() {
+            const poolGrid = document.getElementById('poolGrid');
+            poolGrid.innerHTML = maps.map(map => { const key = mapKey(map); const selected = state.pool.has(key); return `<button class="pool-map ${selected ? 'selected' : 'banned'}" data-pool-map="${key}" type="button" aria-pressed="${selected}"><span class="pool-image" style="--map-image: url('${mapImages[key]}'); --map-tone: ${mapTones[key]}"><img src="${mapImages[key]}" alt="${mapLabels[key][state.language]}" loading="lazy"><span class="pool-state">${selected ? t('active') : t('out')}</span></span><span class="pool-map-name">${mapLabels[key][state.language]}</span></button>`; }).join('');
+            document.getElementById('poolCount').textContent = `${state.pool.size}/${maps.length} ${state.language === 'en' ? 'selected' : state.language === 'es' ? 'seleccionados' : 'selecionados'}`;
+            poolGrid.querySelectorAll('[data-pool-map]').forEach(button => button.addEventListener('click', () => { const key = button.dataset.poolMap; if (state.pool.has(key) && state.pool.size === 1) return; state.pool.has(key) ? state.pool.delete(key) : state.pool.add(key); localStorage.setItem('cs2-map-pool', JSON.stringify([...state.pool])); if (!state.pool.has(state.map)) state.map = [...state.pool][0]; renderPool(); renderMapSelector(); renderMap(); }));
+        }
+
+        function renderMapSelector() {
+            document.getElementById('mapSelector').innerHTML = maps.filter(map => state.pool.has(mapKey(map))).map(map => { const key = mapKey(map); return `<button class="map-btn ${key === state.map ? 'active' : ''}" data-map="${key}" type="button">${mapLabels[key][state.language]}</button>`; }).join('');
+            document.querySelectorAll('.map-btn').forEach(button => button.addEventListener('click', () => { state.map = button.dataset.map; renderMapSelector(); renderMap(); }));
+        }
+
+        function createStrategyCard(side, strategyType, strategyData) {
+            const id = `${state.map}-${side}-${strategyType}`;
+            let content = strategyData.setup ? `<div class="setup-box">${text(strategyData.setup)}</div>` : '';
+            if (strategyData.points) content += `<ul class="bullet-list">${strategyData.points.map(point => `<li>${text(point)}</li>`).join('')}</ul>`;
+            if (strategyData.call) content += `<div class="call-box"><strong>${t('call')}:</strong> ${text(strategyData.call)}</div>`;
+            if (strategyData.variation) content += `<div class="setup-box"><strong>${t('variation')}:</strong> ${text(strategyData.variation)}</div>`;
+            if (strategyData.executions) content += `<div class="setup-box"><strong>${t('executions')}:</strong><ul class="bullet-list">${strategyData.executions.map(item => `<li>${text(item)}</li>`).join('')}</ul></div>`;
+            return `<div class="strategy-card ${favorites.has(id) ? 'favorite' : ''}" data-side="${side}" data-search="${text([strategyType, strategyData.setup, ...(strategyData.points || [])].join(' ')).toLowerCase()}"><div class="strategy-header" data-toggle><span class="strategy-type">${strategyType.toUpperCase()}</span><span class="strategy-meta"><button class="favorite-btn" data-favorite="${id}" type="button" aria-label="Favoritar">${favorites.has(id) ? '★' : '☆'}</button><span class="strategy-toggle">▼</span></span></div><div class="strategy-content">${content}</div></div>`;
+        }
+
+        function renderMap() {
+            const mapData = playbook[state.map];
+            document.getElementById('content').innerHTML = `<div class="map-header"><div class="eyebrow">${state.language === 'en' ? 'Map read' : state.language === 'es' ? 'Lectura del mapa' : 'Leitura do mapa'}</div><div class="map-name">${mapLabels[state.map][state.language]}</div><div class="map-info">${text(mapData.mainPoints)}</div></div><div class="strategies-container"><div class="side-strategies"><div class="side-header ct-header">◈ CT — ${t('ct')}</div>${strategyTypes.map(type => createStrategyCard('ct', type, mapData.ct[type])).join('')}</div><div class="side-strategies"><div class="side-header tr-header">◆ TR — ${t('tr')}</div>${strategyTypes.map(type => createStrategyCard('tr', type, mapData.tr[type])).join('')}</div></div>`;
+            document.querySelectorAll('[data-toggle]').forEach(header => header.addEventListener('click', event => { if (event.target.closest('[data-favorite]')) return; header.nextElementSibling.classList.toggle('open'); header.querySelector('.strategy-toggle').classList.toggle('open'); }));
+            document.querySelectorAll('[data-favorite]').forEach(button => button.addEventListener('click', () => { const id = button.dataset.favorite; favorites.has(id) ? favorites.delete(id) : favorites.add(id); localStorage.setItem('cs2-favorites', JSON.stringify([...favorites])); renderMap(); applyFilters(); }));
+            applyFilters();
+        }
+
+        function applyFilters() { const cards = [...document.querySelectorAll('.strategy-card')]; cards.forEach(card => card.classList.toggle('hidden', (state.side !== 'all' && card.dataset.side !== state.side) || (state.query && !card.dataset.search.includes(state.query)))); document.querySelectorAll('.filter').forEach(button => { const side = button.dataset.side; const visible = cards.filter(card => !card.classList.contains('hidden') && (side === 'all' || card.dataset.side === side)).length; const count = button.querySelector('.filter-count'); if (count) count.textContent = visible; }); }
+        async function renderCommunity() { let entries = JSON.parse(localStorage.getItem('cs2-community') || '[]'); try { const response = await fetch('/api/strategies'); if (response.ok) entries = await response.json(); } catch (_) { /* arquivo aberto diretamente usa o banco local */ } document.getElementById('communityList').innerHTML = entries.length ? entries.map(item => `<article class="community-card"><h3>${text(item.name)}</h3><small>${text(mapLabels[item.map][state.language])} · ${text(item.side.toUpperCase())}</small><p>${text(item.plan)}</p></article>`).join('') : `<p class="subtitle">${t('noCommunity')}</p>`; }
+        function updateLanguage() { const language = i18n[state.language]; document.documentElement.lang = state.language === 'pt' ? 'pt-BR' : state.language; document.getElementById('subtitle').textContent = language.subtitle; document.getElementById('communityLabel').textContent = language.publish; document.getElementById('communityTitle').textContent = language.community; document.getElementById('communityHint').textContent = language.hint; document.getElementById('poolTitle').textContent = language.poolTitle; document.getElementById('poolHint').textContent = language.poolHint; document.getElementById('activeLabel').textContent = language.active; document.getElementById('outLabel').textContent = language.out; document.querySelectorAll('.filter')[0].childNodes[0].textContent = `${language.all} `; renderPool(); renderMapSelector(); renderMap(); renderCommunity(); }
+
+        document.getElementById('language').value = state.language;
+        document.getElementById('language').addEventListener('change', event => { state.language = event.target.value; localStorage.setItem('cs2-language', state.language); updateLanguage(); });
+        document.getElementById('search').addEventListener('input', event => { state.query = event.target.value.toLowerCase().trim(); applyFilters(); });
+        document.querySelectorAll('.filter').forEach(button => button.addEventListener('click', () => { document.querySelectorAll('.filter').forEach(item => item.classList.remove('active')); button.classList.add('active'); state.side = button.dataset.side; applyFilters(); }));
+        const modal = document.getElementById('communityModal');
+        const closeModal = () => modal.classList.remove('open');
+        document.getElementById('communityButton').addEventListener('click', () => modal.classList.add('open'));
+        document.getElementById('closeModal').addEventListener('click', closeModal); document.getElementById('cancelModal').addEventListener('click', closeModal);
+        document.getElementById('strategyMap').innerHTML = maps.map(map => { const key = mapKey(map); return `<option value="${key}">${mapLabels[key].pt}</option>`; }).join('');
+        document.getElementById('communityForm').addEventListener('submit', async event => { event.preventDefault(); const item = { name: document.getElementById('strategyName').value, map: document.getElementById('strategyMap').value, side: document.getElementById('strategySide').value, plan: document.getElementById('strategyPlan').value }; let savedInApi = false; try { const response = await fetch('/api/strategies', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(item) }); savedInApi = response.ok; } catch (_) { /* arquivo aberto diretamente usa o banco local */ } if (!savedInApi) { const entries = JSON.parse(localStorage.getItem('cs2-community') || '[]'); entries.unshift(item); localStorage.setItem('cs2-community', JSON.stringify(entries)); } event.target.reset(); closeModal(); renderCommunity(); });
+        updateLanguage();
+    </script>
+</body>
+</html>
