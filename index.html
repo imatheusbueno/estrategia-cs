@@ -1359,11 +1359,11 @@
             const cards = [...poolGrid.querySelectorAll('[data-pool-map]')];
             let focusedIndex = Math.max(0, cards.findIndex(card => card.dataset.poolMap === state.map));
             const setScale = index => { cards.forEach((card, cardIndex) => { card.style.setProperty('--focus-scale', cardIndex === index ? '1.000' : '.840'); card.style.opacity = cardIndex === index ? '1' : '.72'; }); };
-            const centerCard = index => { focusedIndex = Math.max(0, Math.min(cards.length - 1, index)); const card = cards[focusedIndex]; poolGrid.scrollTo({ left: card.offsetLeft - (poolGrid.clientWidth - card.offsetWidth) / 2, behavior: 'smooth' }); setScale(focusedIndex); updatePoolArrows(); };
+            const centerCard = (index, behavior = 'smooth') => { focusedIndex = Math.max(0, Math.min(cards.length - 1, index)); const card = cards[focusedIndex]; poolGrid.scrollTo({ left: card.offsetLeft - (poolGrid.clientWidth - card.offsetWidth) / 2, behavior }); setScale(focusedIndex); updatePoolArrows(); };
             poolGrid.addEventListener('scroll', () => { const gridCenter = poolGrid.getBoundingClientRect().left + poolGrid.clientWidth / 2; let nearest = 0; let distance = Infinity; cards.forEach((card, index) => { const box = card.getBoundingClientRect(); const currentDistance = Math.abs(box.left + box.width / 2 - gridCenter); if (currentDistance < distance) { nearest = index; distance = currentDistance; } }); focusedIndex = nearest; setScale(nearest); updatePoolArrows(); }, { passive: true });
             document.getElementById('poolPrev').onclick = () => centerCard(focusedIndex - 1);
             document.getElementById('poolNext').onclick = () => centerCard(focusedIndex + 1);
-            centerCard(focusedIndex);
+            centerCard(focusedIndex, 'auto');
         }
 
         function updatePoolArrows() { const poolGrid = document.getElementById('poolGrid'); document.getElementById('poolPrev').disabled = poolGrid.scrollLeft <= 2; document.getElementById('poolNext').disabled = poolGrid.scrollLeft + poolGrid.clientWidth >= poolGrid.scrollWidth - 2; }
