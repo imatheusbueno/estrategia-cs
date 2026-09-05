@@ -1278,8 +1278,7 @@
         const maps = Object.values(playbook);
         const strategyTypes = ['pistol', 'eco', 'force', 'stack', 'fake', 'default'];
         const state = { language: localStorage.getItem('cs2-language') || 'pt', map: 'ancient', side: 'all', query: '', pool: new Set(JSON.parse(localStorage.getItem('cs2-map-pool') || JSON.stringify(Object.keys(playbook)))) };
-        if (!state.pool.size) state.pool.add('ancient');
-        if (!state.pool.has(state.map)) state.map = [...state.pool][0];
+        if (state.pool.size && !state.pool.has(state.map)) state.map = [...state.pool][0];
         const favorites = new Set(JSON.parse(localStorage.getItem('cs2-favorites') || '[]'));
         const i18n = {
             pt: { subtitle: 'Estratégias por mapa. Decisões rápidas para a sua partida.', publish: 'Publicar estratégia', all: 'Todos', empty: 'Selecione um mapa para ver as estratégias', community: 'Estratégias da comunidade', hint: 'Salvas neste navegador e disponíveis offline.', poolTitle: 'Map pool da partida', poolHint: 'Clique nos mapas para colocar ou tirar do pool competitivo.', active: 'ATIVO', out: 'FORA', call: 'Call', variation: 'Variação', executions: 'Execuções', ct: 'Contra-terroristas', tr: 'Terroristas', saved: 'Estratégia salva no banco local', noCommunity: 'Ainda não há estratégias publicadas. Seja o primeiro a compartilhar uma ideia.' },
@@ -1350,7 +1349,7 @@
             const poolMaps = window.matchMedia('(max-width: 600px)').matches ? [maps[maps.length - 1], ...maps.slice(0, -1)] : maps;
             poolGrid.innerHTML = poolMaps.map(map => { const key = mapKey(map); const selected = state.pool.has(key); return `<button class="pool-map ${selected ? 'selected' : 'banned'}" data-pool-map="${key}" type="button" aria-pressed="${selected}"><span class="pool-image" style="--map-image: url('${mapImages[key]}'); --map-tone: ${mapTones[key]}"><img src="${mapImages[key]}" alt="${mapLabels[key][state.language]}" loading="lazy"><span class="pool-state">${selected ? t('active') : t('out')}</span></span><span class="pool-map-name">${mapLabels[key][state.language]}</span></button>`; }).join('');
             document.getElementById('poolCount').textContent = `${state.pool.size}/${maps.length} ${state.language === 'en' ? 'selected' : state.language === 'es' ? 'seleccionados' : 'selecionados'}`;
-            poolGrid.querySelectorAll('[data-pool-map]').forEach(card => card.addEventListener('click', () => { const key = card.dataset.poolMap; if (state.pool.has(key) && state.pool.size === 1) return; state.pool.has(key) ? state.pool.delete(key) : state.pool.add(key); if (state.pool.has(key)) state.map = key; else if (state.map === key) state.map = [...state.pool][0]; localStorage.setItem('cs2-map-pool', JSON.stringify([...state.pool])); renderPool(); renderMapSelector(); renderMap(); }));
+            poolGrid.querySelectorAll('[data-pool-map]').forEach(card => card.addEventListener('click', () => { const key = card.dataset.poolMap; state.pool.has(key) ? state.pool.delete(key) : state.pool.add(key); if (state.pool.has(key)) state.map = key; localStorage.setItem('cs2-map-pool', JSON.stringify([...state.pool])); renderPool(); renderMapSelector(); renderMap(); }));
             setupPoolCarousel();
         }
 
