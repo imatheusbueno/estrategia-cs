@@ -1347,9 +1347,9 @@
 
         function renderPool() {
             const poolGrid = document.getElementById('poolGrid');
-            poolGrid.innerHTML = maps.map(map => { const key = mapKey(map); const selected = state.pool.has(key); return `<article class="pool-map ${selected ? 'selected' : 'banned'}" data-pool-map="${key}" role="button" tabindex="0" aria-pressed="${selected}"><span class="pool-image" style="--map-image: url('${mapImages[key]}'); --map-tone: ${mapTones[key]}"><img src="${mapImages[key]}" alt="${mapLabels[key][state.language]}" loading="lazy"><span class="pool-state">${selected ? t('active') : t('out')}</span></span><span class="pool-map-name">${mapLabels[key][state.language]}</span></article>`; }).join('');
+            poolGrid.innerHTML = maps.map(map => { const key = mapKey(map); const selected = state.pool.has(key); return `<button class="pool-map ${selected ? 'selected' : 'banned'}" data-pool-map="${key}" type="button" aria-pressed="${selected}"><span class="pool-image" style="--map-image: url('${mapImages[key]}'); --map-tone: ${mapTones[key]}"><img src="${mapImages[key]}" alt="${mapLabels[key][state.language]}" loading="lazy"><span class="pool-state">${selected ? t('active') : t('out')}</span></span><span class="pool-map-name">${mapLabels[key][state.language]}</span></button>`; }).join('');
             document.getElementById('poolCount').textContent = `${state.pool.size}/${maps.length} ${state.language === 'en' ? 'selected' : state.language === 'es' ? 'seleccionados' : 'selecionados'}`;
-            poolGrid.querySelectorAll('[data-pool-map]').forEach(card => { const toggleMap = () => { const key = card.dataset.poolMap; if (state.pool.has(key) && state.pool.size === 1) return; state.pool.has(key) ? state.pool.delete(key) : state.pool.add(key); if (state.pool.has(key)) state.map = key; else if (state.map === key) state.map = [...state.pool][0]; localStorage.setItem('cs2-map-pool', JSON.stringify([...state.pool])); renderPool(); renderMapSelector(); renderMap(); }; card.addEventListener('click', toggleMap); card.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleMap(); } }); });
+            poolGrid.querySelectorAll('[data-pool-map]').forEach(card => card.addEventListener('click', () => { const key = card.dataset.poolMap; if (state.pool.has(key) && state.pool.size === 1) return; state.pool.has(key) ? state.pool.delete(key) : state.pool.add(key); if (state.pool.has(key)) state.map = key; else if (state.map === key) state.map = [...state.pool][0]; localStorage.setItem('cs2-map-pool', JSON.stringify([...state.pool])); renderPool(); renderMapSelector(); renderMap(); }));
             setupPoolCarousel();
         }
 
@@ -1358,17 +1358,12 @@
             if (!window.matchMedia('(max-width: 600px)').matches) return;
             const cards = [...poolGrid.querySelectorAll('[data-pool-map]')];
             let focusedIndex = Math.max(0, cards.findIndex(card => card.dataset.poolMap === state.map));
-            let settleTimer;
-            let direction = 0;
-            let programmatic = false;
-            const setScale = (index, settled) => { cards.forEach((card, cardIndex) => { card.style.setProperty('--focus-scale', settled && cardIndex === index ? '1.000' : '.840'); card.style.opacity = settled && cardIndex === index ? '1' : '.72'; }); };
-            const centerCard = (index, behavior = 'smooth') => { const card = cards[index]; if (!card) return; focusedIndex = index; programmatic = behavior === 'smooth'; poolGrid.scrollTo({ left: card.offsetLeft - (poolGrid.clientWidth - card.offsetWidth) / 2, behavior }); setScale(index, behavior !== 'smooth'); updatePoolArrows(); };
-            const settle = () => { poolGrid.classList.remove('is-scrolling'); const nextIndex = programmatic ? focusedIndex : Math.max(0, Math.min(cards.length - 1, focusedIndex + direction)); focusedIndex = nextIndex; programmatic = false; setScale(nextIndex, true); const key = cards[nextIndex].dataset.poolMap; if (state.pool.has(key) && state.map !== key) { state.map = key; renderMapSelector(); renderMap(); } direction = 0; };
-            poolGrid.addEventListener('scroll', () => { poolGrid.classList.add('is-scrolling'); direction = poolGrid.scrollLeft > (poolGrid._lastScrollLeft || poolGrid.scrollLeft) ? 1 : -1; poolGrid._lastScrollLeft = poolGrid.scrollLeft; clearTimeout(settleTimer); settleTimer = setTimeout(settle, 150); updatePoolArrows(); }, { passive: true });
-            document.getElementById('poolPrev').onclick = () => centerCard(Math.max(0, focusedIndex - 1));
-            document.getElementById('poolNext').onclick = () => centerCard(Math.min(cards.length - 1, focusedIndex + 1));
-            centerCard(focusedIndex, 'auto');
-            setScale(focusedIndex, true);
+            const setScale = index => { cards.forEach((card, cardIndex) => { card.style.setProperty('--focus-scale', cardIndex === index ? '1.000' : '.840'); card.style.opacity = cardIndex === index ? '1' : '.72'; }); };
+            const centerCard = index => { focusedIndex = Math.max(0, Math.min(cards.length - 1, index)); const card = cards[focusedIndex]; poolGrid.scrollTo({ left: card.offsetLeft - (poolGrid.clientWidth - card.offsetWidth) / 2, behavior: 'smooth' }); setScale(focusedIndex); updatePoolArrows(); };
+            poolGrid.addEventListener('scroll', () => { const gridCenter = poolGrid.getBoundingClientRect().left + poolGrid.clientWidth / 2; let nearest = 0; let distance = Infinity; cards.forEach((card, index) => { const box = card.getBoundingClientRect(); const currentDistance = Math.abs(box.left + box.width / 2 - gridCenter); if (currentDistance < distance) { nearest = index; distance = currentDistance; } }); focusedIndex = nearest; setScale(nearest); updatePoolArrows(); }, { passive: true });
+            document.getElementById('poolPrev').onclick = () => centerCard(focusedIndex - 1);
+            document.getElementById('poolNext').onclick = () => centerCard(focusedIndex + 1);
+            centerCard(focusedIndex);
         }
 
         function updatePoolArrows() { const poolGrid = document.getElementById('poolGrid'); document.getElementById('poolPrev').disabled = poolGrid.scrollLeft <= 2; document.getElementById('poolNext').disabled = poolGrid.scrollLeft + poolGrid.clientWidth >= poolGrid.scrollWidth - 2; }
