@@ -1289,9 +1289,46 @@
         const mapTones = { ancient: '#34453f', mirage: '#5a4834', dust2: '#695137', anubis: '#55473a', cache: '#3b503f', inferno: '#603c2d', nuke: '#3d5154' };
         const ptCallouts = {
             ancient: { Donut: 'Rosquinha', Cave: 'Escuro' },
-            mirage: { Underpass: 'Caverna', Connector: 'Liga', Window: 'Janela' },
+            mirage: { Underpass: 'Caverna', Connector: 'Liga', Window: 'Janela', Apps: 'Varanda' },
             dust2: { Long: 'Varanda', Cat: 'Rampa', Short: 'Rampa' },
             cache: { Highway: 'Xaromba' }
+        };
+        const mapProtocols = {
+            ancient: [
+                { title: 'Abertura', steps: ['Smoke na Rosquinha para cortar a visão do Mid', 'Flash por cima do Mid e outro na entrada', '1 jogador pega a informação; se não houver contato, recua'] },
+                { title: 'Anti-rush', steps: ['Smoke na entrada do bombsite assim que ouvir vários passos', 'Flash por cima da fumaça e joga para troca', 'Não avançar sozinho: segura o primeiro contato e recua'] },
+                { title: 'Contra time agressivo', steps: ['Se perder o primeiro duelo, para de caçar e fecha a passagem', 'Guarda uma flash para a segunda entrada', 'Com a kill, recua e deixa o TR vir buscar a troca'] }
+            ],
+            mirage: [
+                { title: 'Abertura', steps: ['Smoke Janela e Liga para o avanço do Mid', 'Flash Top Mid e uma flash por cima da Varanda', 'Depois do espaço, escolhe entre dividir A ou voltar para B'] },
+                { title: 'Anti-rush B', steps: ['Smoke na Varanda assim que aparecerem vários TRs', 'Flash dentro da Varanda e joga para troca', 'Se a entrada vier forte, recua para o bombsite e pede rotação'] },
+                { title: 'Contra time agressivo', steps: ['Deixa a flash pronta para o avanço da Caverna ou do Mid', 'Não repeeka a Janela sem ajuda', 'Depois da primeira kill, fecha Liga e joga 5v4'] }
+            ],
+            dust2: [
+                { title: 'Abertura', steps: ['Smoke CT e fumaça na passagem para cruzar a Varanda', 'Flash na Varanda para ganhar o primeiro espaço', 'Um jogador segura o Fundo enquanto o resto decide A ou B'] },
+                { title: 'Anti-rush B', steps: ['Smoke na Porta B assim que ouvir o rush', 'Flash por cima da fumaça e segura o primeiro contato', 'Recuar para o Bomb B e jogar todas as trocas'] },
+                { title: 'Contra time agressivo', steps: ['Se vierem muitos na Varanda, não entrega duelo aberto', 'Usa smoke para cortar a visão e chama ajuda do Bomb A', 'Depois da kill, guarda a flash para a entrada final'] }
+            ],
+            anubis: [
+                { title: 'Abertura', steps: ['Smoke no acesso do Mid e flash para tomar Water', 'Um jogador acompanha a flash para pegar informação', 'Com espaço, junta os jogadores e escolhe A ou B'] },
+                { title: 'Anti-rush B', steps: ['Smoke na entrada do Bomb B quando ouvir o rush', 'Flash alta para atrasar a entrada e joga para troca', 'Não sair procurando kill: espera a rotação chegar'] },
+                { title: 'Contra time agressivo', steps: ['Se o CT avançar no Mid, usa flash para punir e recua', 'Não fica espalhado depois da primeira kill', 'Fecha o caminho de rotação antes de plantar'] }
+            ],
+            cache: [
+                { title: 'Abertura', steps: ['Smoke no Mid e flash para tomar o espaço', 'Um jogador acompanha para pegar contato no Xaromba', 'Se o CT recuar, junta 3 para A ou acelera B'] },
+                { title: 'Anti-rush B', steps: ['Smoke na entrada do Bomb B e flash na primeira curva', 'Joga colado para trocar a primeira kill', 'Se perder espaço, recua e espera a rotação'] },
+                { title: 'Contra time agressivo', steps: ['Guarda flash para o avanço do Escanteio', 'Não repete o mesmo peek depois de perder vida', 'Com vantagem, segura as entradas e não entrega duelo'] }
+            ],
+            inferno: [
+                { title: 'Abertura', steps: ['Smoke CT ou Arco e duas flashes para ganhar Banana', 'Um jogador fica pronto para a flash de retake', 'Com controle, guarda smoke para o final da execução'] },
+                { title: 'Anti-rush B', steps: ['Smoke na Banana e flash por cima assim que ouvir passos', 'Joga para troca e recua se vierem cinco juntos', 'Pede rotação antes de aparecer no bombsite'] },
+                { title: 'Contra time agressivo', steps: ['Se tomarem Banana, não tenta recuperar sozinho', 'Usa molotov para atrasar e flash para retomar em grupo', 'Depois da kill, fecha a entrada e segura o retake'] }
+            ],
+            nuke: [
+                { title: 'Abertura', steps: ['Smoke na passagem da Fora e flash para ganhar espaço', 'Rampa fica pronta para a descida; outro jogador segura Casinha', 'Se o CT mostrar muita presença, volta e muda para o Miolo'] },
+                { title: 'Anti-rush Rampa', steps: ['Smoke no começo da Rampa assim que ouvir vários passos', 'Flash por cima da fumaça e joga para troca', 'Recuar para o Miolo se perder a primeira posição'] },
+                { title: 'Contra time agressivo', steps: ['Se avançarem na Fora, não repeeka sem flash', 'Usa smoke e flash para recuperar a Caixa vermelha ou a Garagem', 'Com a kill, fecha Sicrit e deixa o TR se expor'] }
+            ]
         };
         const text = value => {
             let result = String(value);
@@ -1328,9 +1365,13 @@
             return `<div class="strategy-card ${favorites.has(id) ? 'favorite' : ''}" data-side="${side}" data-search="${text([strategyType, strategyData.setup, ...(strategyData.points || [])].join(' ')).toLowerCase()}"><div class="strategy-header" data-toggle><span class="strategy-type">${strategyType.toUpperCase()}</span><span class="strategy-meta"><button class="favorite-btn" data-favorite="${id}" type="button" aria-label="Favoritar">${favorites.has(id) ? '★' : '☆'}</button><span class="strategy-toggle">▼</span></span></div><div class="strategy-content">${content}</div></div>`;
         }
 
+        function renderProtocols(protocols) {
+            return `<section class="protocols-panel"><h2>Protocolos da rodada</h2><p class="protocols-hint">Smoke primeiro, flash depois. Se perder o primeiro duelo, recua e joga para troca.</p><div class="protocols-grid">${protocols.map(protocol => `<article class="protocol-card"><h3>${text(protocol.title)}</h3><ul class="bullet-list">${protocol.steps.map(step => `<li>${text(step)}</li>`).join('')}</ul></article>`).join('')}</div></section>`;
+        }
+
         function renderMap() {
             const mapData = playbook[state.map];
-            document.getElementById('content').innerHTML = `<div class="map-header"><div class="eyebrow">${state.language === 'en' ? 'Map read' : state.language === 'es' ? 'Lectura del mapa' : 'Leitura do mapa'}</div><div class="map-name">${mapLabels[state.map][state.language]}</div><div class="map-info">${text(mapData.mainPoints)}</div></div><div class="strategies-container"><div class="side-strategies"><div class="side-header ct-header">◈ CT — ${t('ct')}</div>${strategyTypes.map(type => createStrategyCard('ct', type, mapData.ct[type])).join('')}</div><div class="side-strategies"><div class="side-header tr-header">◆ TR — ${t('tr')}</div>${strategyTypes.map(type => createStrategyCard('tr', type, mapData.tr[type])).join('')}</div></div>`;
+            document.getElementById('content').innerHTML = `<div class="map-header"><div class="eyebrow">${state.language === 'en' ? 'Map read' : state.language === 'es' ? 'Lectura del mapa' : 'Leitura do mapa'}</div><div class="map-name">${mapLabels[state.map][state.language]}</div><div class="map-info">${text(mapData.mainPoints)}</div></div>${renderProtocols(mapProtocols[state.map])}<div class="strategies-container"><div class="side-strategies"><div class="side-header ct-header">◈ CT — ${t('ct')}</div>${strategyTypes.map(type => createStrategyCard('ct', type, mapData.ct[type])).join('')}</div><div class="side-strategies"><div class="side-header tr-header">◆ TR — ${t('tr')}</div>${strategyTypes.map(type => createStrategyCard('tr', type, mapData.tr[type])).join('')}</div></div>`;
             document.querySelectorAll('[data-toggle]').forEach(header => header.addEventListener('click', event => { if (event.target.closest('[data-favorite]')) return; header.nextElementSibling.classList.toggle('open'); header.querySelector('.strategy-toggle').classList.toggle('open'); }));
             document.querySelectorAll('[data-favorite]').forEach(button => button.addEventListener('click', () => { const id = button.dataset.favorite; favorites.has(id) ? favorites.delete(id) : favorites.add(id); localStorage.setItem('cs2-favorites', JSON.stringify([...favorites])); renderMap(); applyFilters(); }));
             applyFilters();

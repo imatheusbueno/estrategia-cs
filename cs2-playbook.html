@@ -1289,10 +1289,15 @@
         const mapTones = { ancient: '#34453f', mirage: '#5a4834', dust2: '#695137', anubis: '#55473a', cache: '#3b503f', inferno: '#603c2d', nuke: '#3d5154' };
         const ptCallouts = {
             ancient: { Donut: 'Rosquinha', Cave: 'Escuro' },
-            mirage: { Underpass: 'Caverna', Connector: 'Liga', Window: 'Janela' },
+            mirage: { Underpass: 'Caverna', Connector: 'Liga', Window: 'Janela', Apps: 'Varanda' },
             dust2: { Long: 'Varanda', Cat: 'Rampa', Short: 'Rampa' },
             cache: { Highway: 'Xaromba' }
         };
+        const mapProtocols = Object.fromEntries(Object.keys(playbook).map(map => [map, [
+            { title: 'Abertura', steps: ['Smoke para cortar a primeira visão', 'Flash para ganhar espaço', 'Se não houver contato, recuar e guardar utilitária'] },
+            { title: 'Anti-rush', steps: ['Smoke na entrada quando ouvir vários passos', 'Flash por cima e joga para troca', 'Recuar para o bombsite se perder a primeira posição'] },
+            { title: 'Contra time agressivo', steps: ['Não repeeka sem flash ou ajuda', 'Usa smoke para quebrar a visão', 'Depois da kill, fecha a entrada e joga 5v4'] }
+        ]]));
         const text = value => {
             let result = String(value);
             if (state.language === 'pt') {
@@ -1328,9 +1333,13 @@
             return `<div class="strategy-card ${favorites.has(id) ? 'favorite' : ''}" data-side="${side}" data-search="${text([strategyType, strategyData.setup, ...(strategyData.points || [])].join(' ')).toLowerCase()}"><div class="strategy-header" data-toggle><span class="strategy-type">${strategyType.toUpperCase()}</span><span class="strategy-meta"><button class="favorite-btn" data-favorite="${id}" type="button" aria-label="Favoritar">${favorites.has(id) ? '★' : '☆'}</button><span class="strategy-toggle">▼</span></span></div><div class="strategy-content">${content}</div></div>`;
         }
 
+        function renderProtocols(protocols) {
+            return `<section class="protocols-panel"><h2>Protocolos da rodada</h2><p class="protocols-hint">Smoke primeiro, flash depois. Se perder o primeiro duelo, recua e joga para troca.</p><div class="protocols-grid">${protocols.map(protocol => `<article class="protocol-card"><h3>${text(protocol.title)}</h3><ul class="bullet-list">${protocol.steps.map(step => `<li>${text(step)}</li>`).join('')}</ul></article>`).join('')}</div></section>`;
+        }
+
         function renderMap() {
             const mapData = playbook[state.map];
-            document.getElementById('content').innerHTML = `<div class="map-header"><div class="eyebrow">${state.language === 'en' ? 'Map read' : state.language === 'es' ? 'Lectura del mapa' : 'Leitura do mapa'}</div><div class="map-name">${mapLabels[state.map][state.language]}</div><div class="map-info">${text(mapData.mainPoints)}</div></div><div class="strategies-container"><div class="side-strategies"><div class="side-header ct-header">◈ CT — ${t('ct')}</div>${strategyTypes.map(type => createStrategyCard('ct', type, mapData.ct[type])).join('')}</div><div class="side-strategies"><div class="side-header tr-header">◆ TR — ${t('tr')}</div>${strategyTypes.map(type => createStrategyCard('tr', type, mapData.tr[type])).join('')}</div></div>`;
+            document.getElementById('content').innerHTML = `<div class="map-header"><div class="eyebrow">${state.language === 'en' ? 'Map read' : state.language === 'es' ? 'Lectura del mapa' : 'Leitura do mapa'}</div><div class="map-name">${mapLabels[state.map][state.language]}</div><div class="map-info">${text(mapData.mainPoints)}</div></div>${renderProtocols(mapProtocols[state.map])}<div class="strategies-container"><div class="side-strategies"><div class="side-header ct-header">◈ CT — ${t('ct')}</div>${strategyTypes.map(type => createStrategyCard('ct', type, mapData.ct[type])).join('')}</div><div class="side-strategies"><div class="side-header tr-header">◆ TR — ${t('tr')}</div>${strategyTypes.map(type => createStrategyCard('tr', type, mapData.tr[type])).join('')}</div></div>`;
             document.querySelectorAll('[data-toggle]').forEach(header => header.addEventListener('click', event => { if (event.target.closest('[data-favorite]')) return; header.nextElementSibling.classList.toggle('open'); header.querySelector('.strategy-toggle').classList.toggle('open'); }));
             document.querySelectorAll('[data-favorite]').forEach(button => button.addEventListener('click', () => { const id = button.dataset.favorite; favorites.has(id) ? favorites.delete(id) : favorites.add(id); localStorage.setItem('cs2-favorites', JSON.stringify([...favorites])); renderMap(); applyFilters(); }));
             applyFilters();
