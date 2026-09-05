@@ -1151,80 +1151,80 @@
             },
             nuke: {
                 name: 'NUKE',
-                mainPoints: 'Nuke depende muito de controle de Outside e das rotações verticais. É um mapa naturalmente mais favorável ao CT, então o TR precisa conquistar espaço sem perder jogadores gratuitamente.',
+                mainPoints: 'Nuke depende muito do controle de Fora e das rotações verticais. É um mapa naturalmente mais favorável ao CT, então o TR precisa conquistar espaço sem perder jogadores de graça.',
                 ct: {
                     pistol: {
-                        setup: '1 Outside + 2 Ramp + 2 A/Hut',
+                        setup: '1 Fora + 2 Rampa + 2 A/Casinha',
                         points: [
-                            'Outside pega informação',
-                            'Ramp controla acesso ao Lower',
+                            'Fora pega informação',
+                            'Rampa controla acesso ao Miolo',
                             '2 jogadores protegem A',
-                            'Evitar avançar demais Outside'
+                            'Evitar avançar demais na Fora'
                         ]
                     },
                     eco: {
-                        setup: 'Stack Ramp',
+                        setup: 'Stack Rampa',
                         points: [
-                            '4 Ramp',
-                            '1 Outside',
+                            '4 Rampa',
+                            '1 Fora',
                             'Esperar entrada',
                             'Jogar em curta distância'
                         ]
                     },
                     force: {
-                        setup: 'Agressão Outside',
+                        setup: 'Agressão na Fora',
                         points: [
-                            '3 Outside',
-                            '1 Ramp',
+                            '3 Fora',
+                            '1 Rampa',
                             '1 A',
                             'Procurar primeira kill',
                             'Recuar'
                         ]
                     },
                     stack: {
-                        setup: '5 Ramp',
+                        setup: '5 Rampa',
                         points: [
-                            'Todos Ramp',
+                            'Todos Rampa',
                             'Esperar descida',
                             'Primeiro contato → todos atacam',
-                            'Excelente contra execução Lower'
+                            'Excelente contra execução no Miolo'
                         ]
                     },
                     fake: {
-                        setup: 'Gamble Lower',
+                        setup: 'Gamble Miolo',
                         points: [
-                            '4 jogadores preparados para Lower',
+                            '4 jogadores preparados para o Miolo',
                             '1 A',
-                            'Se TR demonstrar Outside/Ramp, ajustar',
-                            'Objetivo é fazer o TR acreditar que Lower está aberto'
+                            'Se TR demonstrar Fora/Rampa, ajustar',
+                            'Objetivo é fazer o TR acreditar que o Miolo está aberto'
                         ]
                     },
                     default: {
-                        setup: '1 Outside + 2 A + 2 Ramp/Lower',
+                        setup: '1 Fora + 2 A + 2 Rampa/Miolo',
                         points: [
-                            'Outside busca informação',
-                            'Ramp controla descida',
-                            'A segura Hut/Squeaky',
-                            'Não dar pick gratuito Outside'
+                            'Fora busca informação',
+                            'Rampa controla a descida',
+                            'A segura Casinha/Porta amarela',
+                            'Não dar pick de graça na Fora'
                         ]
                     }
                 },
                 tr: {
                     pistol: {
-                        setup: '3 Outside + 2 Ramp',
+                        setup: '3 Fora + 2 Rampa',
                         points: [
-                            'Tomar Outside',
-                            'Entrar Secret',
+                            'Tomar a Fora',
+                            'Entrar no Sicrit',
                             'Descer B',
                             'Plantar',
                             '1 jogador fica controlando rotação'
                         ],
-                        call: 'Outside → Secret → B'
+                        call: 'Fora → Sicrit → B'
                     },
                     eco: {
-                        setup: 'Rush Ramp',
+                        setup: 'Rush Rampa',
                         points: [
-                            '5 Ramp',
+                            '5 Rampa',
                             'Flash',
                             'Descer juntos',
                             'Buscar kills',
@@ -1232,18 +1232,18 @@
                         ]
                     },
                     force: {
-                        setup: 'Fast Outside',
+                        setup: 'Fast Fora',
                         points: [
-                            '3 Outside',
-                            '2 Hut',
-                            'Tomar Secret',
+                            '3 Fora',
+                            '2 Casinha',
+                            'Tomar o Sicrit',
                             'Fazer split B'
                         ]
                     },
                     stack: {
-                        setup: '5 Ramp',
+                        setup: '5 Rampa',
                         points: [
-                            'Todos Ramp',
+                            'Todos Rampa',
                             'Flash',
                             'Entrar juntos',
                             'Primeiro jogador abre',
@@ -1251,23 +1251,23 @@
                         ]
                     },
                     fake: {
-                        setup: 'Fake Outside → A',
+                        setup: 'Fake Fora → A',
                         points: [
-                            '3 Outside',
-                            '2 Hut/Squeaky',
+                            '3 Fora',
+                            '2 Casinha/Porta amarela',
                             'Fazer CTs acreditarem em B',
-                            'Recuar Secret',
-                            'Entrar A pelo Hut/Squeaky'
+                            'Recuar pelo Sicrit',
+                            'Entrar A pela Casinha/Porta amarela'
                         ]
                     },
                     default: {
-                        setup: '3 Outside + 1 Ramp + 1 Lobby',
+                        setup: '3 Fora + 1 Rampa + 1 Terra',
                         points: [
-                            'Outside busca controle',
-                            'Ramp busca informação',
-                            'Lobby mantém pressão A'
+                            'Fora busca controle',
+                            'Rampa busca informação',
+                            'Terra mantém pressão A'
                         ],
-                        executions: ['Outside → Secret → B', 'Ramp → B', 'Fake B → A']
+                        executions: ['Fora → Sicrit → B', 'Rampa → B', 'Fake B → A']
                     }
                 }
             }
