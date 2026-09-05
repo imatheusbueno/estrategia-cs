@@ -1347,7 +1347,33 @@
             const poolGrid = document.getElementById('poolGrid');
             poolGrid.innerHTML = maps.map(map => { const key = mapKey(map); const selected = state.pool.has(key); return `<button class="pool-map ${selected ? 'selected' : 'banned'}" data-pool-map="${key}" type="button" aria-pressed="${selected}"><span class="pool-image" style="--map-image: url('${mapImages[key]}'); --map-tone: ${mapTones[key]}"><img src="${mapImages[key]}" alt="${mapLabels[key][state.language]}" loading="lazy"><span class="pool-state">${selected ? t('active') : t('out')}</span></span><span class="pool-map-name">${mapLabels[key][state.language]}</span></button>`; }).join('');
             document.getElementById('poolCount').textContent = `${state.pool.size}/${maps.length} ${state.language === 'en' ? 'selected' : state.language === 'es' ? 'seleccionados' : 'selecionados'}`;
-            poolGrid.querySelectorAll('[data-pool-map]').forEach(button => button.addEventListener('click', () => { const key = button.dataset.poolMap; if (state.pool.has(key) && state.pool.size === 1) return; state.pool.has(key) ? state.pool.delete(key) : state.pool.add(key); localStorage.setItem('cs2-map-pool', JSON.stringify([...state.pool])); if (!state.pool.has(state.map)) state.map = [...state.pool][0]; renderPool(); renderMapSelector(); renderMap(); }));
+            poolGrid.querySelectorAll('[data-pool-map]').forEach(button => button.addEventListener('click', () => { const key = button.dataset.poolMap; if (window.matchMedia('(max-width: 600px)').matches) { state.map = key; renderMapSelector(); renderMap(); button.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); return; } if (state.pool.has(key) && state.pool.size === 1) return; state.pool.has(key) ? state.pool.delete(key) : state.pool.add(key); localStorage.setItem('cs2-map-pool', JSON.stringify([...state.pool])); if (!state.pool.has(state.map)) state.map = [...state.pool][0]; renderPool(); renderMapSelector(); renderMap(); }));
+            setupPoolCarousel();
+        }
+
+        function setupPoolCarousel() {
+            const poolGrid = document.getElementById('poolGrid');
+            if (!window.matchMedia('(max-width: 600px)').matches) return;
+            const updateFocus = () => {
+                const gridCenter = poolGrid.getBoundingClientRect().left + poolGrid.clientWidth / 2;
+                let closest = null;
+                let closestDistance = Infinity;
+                poolGrid.querySelectorAll('[data-pool-map]').forEach(button => {
+                    const box = button.getBoundingClientRect();
+                    const distance = Math.abs(box.left + box.width / 2 - gridCenter);
+                    const scale = Math.max(.84, 1 - distance / (box.width * 5));
+                    button.style.setProperty('--focus-scale', scale.toFixed(3));
+                    button.style.opacity = Math.max(.62, scale).toFixed(2);
+                    if (distance < closestDistance) { closest = button; closestDistance = distance; }
+                });
+                if (closest && state.pool.has(closest.dataset.poolMap) && state.map !== closest.dataset.poolMap) {
+                    state.map = closest.dataset.poolMap;
+                    renderMapSelector();
+                    renderMap();
+                }
+            };
+            poolGrid.addEventListener('scroll', updateFocus, { passive: true });
+            updateFocus();
         }
 
         function renderMapSelector() {
